@@ -21,14 +21,16 @@ _debug = false;
  * @param grid_dimensions [length, width] of a single Gridfinity base.
  * @param thumbscrew Enable "gridfinity-refined" thumbscrew hole in the center of each base unit. This is a ISO Metric Profile, 15.0mm size, M15x1.5 designation.
  */
-module gridfinityBase(grid_size, grid_dimensions=GRID_DIMENSIONS_MM, hole_options=bundle_hole_options(), only_corners=false, thumbscrew=false) {
+module gridfinityBase(grid_size, grid_dimensions=GRID_DIMENSIONS_MM, hole_options=bundle_hole_options(), only_corners=false, thumbscrew=false, only_edges=false) {
     assert(is_list(grid_dimensions) && len(grid_dimensions) == 2 &&
         grid_dimensions.x > 0 && grid_dimensions.y > 0);
     assert(is_list(grid_size) && len(grid_size) == 2 &&
         grid_size.x > 0 && grid_size.y > 0);
     assert(
         is_bool(only_corners) &&
-        is_bool(thumbscrew)
+        is_bool(thumbscrew) &&
+        is_bool(only_edges)
+        
     );
 
     individual_base_size_mm = grid_dimensions - BASE_GAP_MM;
@@ -59,6 +61,17 @@ module gridfinityBase(grid_size, grid_dimensions=GRID_DIMENSIONS_MM, hole_option
             _base_holes(hole_options, grid_size_mm);
             _base_preview_fix();
         }
+    }
+    else if (only_edges)
+    {
+        pattern_grid(grid_size, grid_dimensions, true, true)
+        block_base(hole_options, individual_base_size_mm, thumbscrew=thumbscrew);
+        intersection () {
+            pattern_grid(grid_size, grid_dimensions, true, true)
+            block_base(bundle_hole_options(), individual_base_size_mm, thumbscrew=thumbscrew);
+            cube(size = [ (grid_size.x-1)*grid_dimensions.x, (grid_size.y-1)*grid_dimensions.y, 14 ], center = true);
+        }
+
     }
     else {
         pattern_grid(grid_size, grid_dimensions, true, true)

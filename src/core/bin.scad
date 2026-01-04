@@ -49,7 +49,8 @@ function new_bin(
         only_corners=false,
         thumbscrew=false,
         grid_dimensions = GRID_DIMENSIONS_MM,
-        base_thickness = BASE_HEIGHT
+        base_thickness = BASE_HEIGHT,
+        only_edges=false,
     ) =
     assert(is_valid_2d(grid_size) && is_positive(grid_size))
     assert(is_num(height_mm) && height_mm >= BASE_HEIGHT)
@@ -69,6 +70,7 @@ function new_bin(
         || fill_height <= 0
         || fill_height <= height_mm - STACKING_LIP_SUPPORT_HEIGHT,
         str("Maximum fill_height for this bin is", height_mm - STACKING_LIP_SUPPORT_HEIGHT))
+    assert(is_bool(only_edges))
     let(fill_height_calculated = include_lip ?
         height_mm - BASE_HEIGHT - STACKING_LIP_SUPPORT_HEIGHT
         : height_mm - BASE_HEIGHT)
@@ -94,7 +96,8 @@ function new_bin(
         undef,
         hole_options,
         only_corners,
-        thumbscrew
+        thumbscrew,
+        only_edges
     ];
 
 /*
@@ -151,6 +154,7 @@ module bin_render_infill(bin) {
     hole_options = bin[8];
     only_corners = bin[9];
     thumbscrew = bin[10];
+    only_edges = bin[11];
 
     grid_size_mm = as_2d(grid_get_total_dimensions(base_grid));
     grid_size = bin_get_bases(bin);
@@ -177,7 +181,8 @@ module bin_render_infill(bin) {
                 grid_dimensions=grid_dimensions,
                 hole_options=hole_options,
                 only_corners=only_corners,
-                thumbscrew=thumbscrew);
+                thumbscrew=thumbscrew,
+                only_edges=only_edges);
         }
     }
 }
@@ -211,6 +216,7 @@ module bin_render_base(bin) {
     hole_options = bin[8];
     only_corners = bin[9];
     thumbscrew = bin[10];
+    only_edges = bin[11];
 
     grid_size = bin_get_bases(bin);
     grid_dimensions = bin_get_grid_dimensions(bin);
@@ -220,14 +226,16 @@ module bin_render_base(bin) {
             grid_dimensions=grid_dimensions,
             hole_options=hole_options,
             only_corners=only_corners,
-            thumbscrew=thumbscrew);
+            thumbscrew=thumbscrew,
+            only_edges=only_edges);
     } else {
         gridfinity_base_lite(grid_size,
             grid_dimensions=grid_dimensions,
             wall_thickness=d_wall,
             bottom_thickness=base_thickness,
             hole_options=hole_options,
-            only_corners=only_corners);
+            only_corners=only_corners,
+            only_edges=only_edges);
     }
 }
 
