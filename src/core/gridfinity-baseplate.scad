@@ -36,10 +36,10 @@ BASEPLATE_OUTER_DIAMETER = 8;
  *          Does NOT include the clearance height.
  */
 _BASEPLATE_PROFILE = [
-    [0, 0], // Innermost bottom point
-    [0.7, 0.7], // Up and out at a 45 degree angle
-    [0.7, (0.7+1.8)], // Straight up
-    [(0.7+2.15), (0.7+1.8+2.15)], // Up and out at a 45 degree angle
+  [0, 0], // Innermost bottom point
+  [0.7, 0.7], // Up and out at a 45 degree angle
+  [0.7, (0.7 + 1.8)], // Straight up
+  [(0.7 + 2.15), (0.7 + 1.8 + 2.15)], // Up and out at a 45 degree angle
 ];
 
 // ****************************************
@@ -75,20 +75,26 @@ BASEPLATE_INNER_DIAMETER = BASEPLATE_INNER_RADIUS * 2;
                  Must be the same as or larger than BASEPLATE_HEIGHT.
  */
 module _baseplate_cutter_polygon(height) {
-    assert(height >= BASEPLATE_HEIGHT, "_baseplate_cutter_polygon: height may not be less than BASEPLATE_HEIGHT");
-    // The minimum height between the baseplate lip and anything below it.
-    // Needed to make sure the base always makes contact with the baseplate lip.
-    _baseplate_clearance_height = height - _BASEPLATE_PROFILE[3].y;
-    assert(_baseplate_clearance_height > 0, "Baseplate too short.");
+  assert(height >= BASEPLATE_HEIGHT, "_baseplate_cutter_polygon: height may not be less than BASEPLATE_HEIGHT");
+  // The minimum height between the baseplate lip and anything below it.
+  // Needed to make sure the base always makes contact with the baseplate lip.
+  _baseplate_clearance_height = height - _BASEPLATE_PROFILE[3].y;
+  assert(_baseplate_clearance_height > 0, "Baseplate too short.");
 
-    translated_line = foreach_add(_BASEPLATE_PROFILE,
-        [BASEPLATE_INNER_RADIUS, _baseplate_clearance_height]);
+  translated_line = foreach_add(
+    _BASEPLATE_PROFILE,
+    [BASEPLATE_INNER_RADIUS, _baseplate_clearance_height]
+  );
 
-    polygon(concat(translated_line, [
-            [0, height],  // Go in to form a solid polygon
-            [0, 0],  // Straight down
-            [translated_line[0].x, 0] // Out to the translated start.
-        ]));
+  polygon(
+    concat(
+      translated_line, [
+        [0, height], // Go in to form a solid polygon
+        [0, 0], // Straight down
+        [translated_line[0].x, 0], // Out to the translated start.
+      ]
+    )
+  );
 }
 
 // ****************************************
@@ -102,7 +108,7 @@ module _baseplate_cutter_polygon(height) {
  * @Details To be used with `rounded_square(...)` from generic-helpers.
  * @Example `rounded_square(baseplate_inner_size(), BASEPLATE_INNER_RADIUS, center=true);`
  */
-function baseplate_inner_size(size=BASEPLATE_DIMENSIONS) = foreach_add(size, BASEPLATE_INNER_DIAMETER - BASEPLATE_OUTER_DIAMETER);
+function baseplate_inner_size(size = BASEPLATE_DIMENSIONS) = foreach_add(size, BASEPLATE_INNER_DIAMETER - BASEPLATE_OUTER_DIAMETER);
 
 /**
  * @Summary The negative of a single baseplate.
@@ -112,33 +118,31 @@ function baseplate_inner_size(size=BASEPLATE_DIMENSIONS) = foreach_add(size, BAS
                  Must be the same as or larger than BASEPLATE_HEIGHT.
  * @Details Use with `difference()`.
  */
-module baseplate_cutter(size=BASEPLATE_DIMENSIONS, height=BASEPLATE_HEIGHT) {
-    assert(
-        is_list(size) &&
-        len(size) == 2 &&
-        size.x > BASEPLATE_OUTER_DIAMETER &&
-        size.y > BASEPLATE_OUTER_DIAMETER,
-        "baseplate_cutter: argument 'dimensions' less than BASEPLATE_OUTER_DIAMETER.");
-    assert(height >= BASEPLATE_HEIGHT, "baseplate_cutter: height may not be less than BASEPLATE_HEIGHT");
+module baseplate_cutter(size = BASEPLATE_DIMENSIONS, height = BASEPLATE_HEIGHT) {
+  assert(
+    is_list(size) && len(size) == 2 && size.x > BASEPLATE_OUTER_DIAMETER && size.y > BASEPLATE_OUTER_DIAMETER,
+    "baseplate_cutter: argument 'dimensions' less than BASEPLATE_OUTER_DIAMETER."
+  );
+  assert(height >= BASEPLATE_HEIGHT, "baseplate_cutter: height may not be less than BASEPLATE_HEIGHT");
 
-    inner_dimensions = foreach_add(size, -BASEPLATE_OUTER_DIAMETER);
+  inner_dimensions = foreach_add(size, -BASEPLATE_OUTER_DIAMETER);
 
-    //Cube's dimensions are set to ensure overlap with `sweep_rounded(...)`
-    //without using `rounded_square(...)`.
-    inner_size = baseplate_inner_size(size);
-    cube_dimensions = [
-            inner_size.x - BASEPLATE_INNER_RADIUS,
-            inner_size.y - BASEPLATE_INNER_RADIUS,
-            height
-        ];
-    union(){
-        sweep_rounded(inner_dimensions){
-            _baseplate_cutter_polygon(height);
-        }
-
-        translate([0, 0, height/2])
-        cube(cube_dimensions, center = true);
+  //Cube's dimensions are set to ensure overlap with `sweep_rounded(...)`
+  //without using `rounded_square(...)`.
+  inner_size = baseplate_inner_size(size);
+  cube_dimensions = [
+    inner_size.x - BASEPLATE_INNER_RADIUS,
+    inner_size.y - BASEPLATE_INNER_RADIUS,
+    height,
+  ];
+  union() {
+    sweep_rounded(inner_dimensions) {
+      _baseplate_cutter_polygon(height);
     }
+
+    translate([0, 0, height / 2])
+      cube(cube_dimensions, center=true);
+  }
 }
 
 /**
@@ -149,12 +153,14 @@ module baseplate_cutter(size=BASEPLATE_DIMENSIONS, height=BASEPLATE_HEIGHT) {
  * @param height Height of the baseplate's hollow section.
                  Must be the same as or larger than BASEPLATE_HEIGHT.
  */
-module single_baseplate(size=BASEPLATE_DIMENSIONS, height=BASEPLATE_HEIGHT) {
-    difference() {
-        linear_extrude(height)
-        rounded_square(size,
-            radius = BASEPLATE_OUTER_RADIUS, center=true);
+module single_baseplate(size = BASEPLATE_DIMENSIONS, height = BASEPLATE_HEIGHT) {
+  difference() {
+    linear_extrude(height)
+      rounded_square(
+        size,
+        radius=BASEPLATE_OUTER_RADIUS, center=true
+      );
 
-        baseplate_cutter(size, height);
-    }
+    baseplate_cutter(size, height);
+  }
 }

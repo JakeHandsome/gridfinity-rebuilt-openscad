@@ -4,12 +4,12 @@
  * @details These include some common operations which should probably be included with OpenSCAD.
  */
 
- /**
+/**
  * @brief Reverse the order of elements in a list.
  */
 function reverse(list) =
-    assert(is_list(list))
-    [for(i=[len(list)-1:-1:0]) list[i]];
+  assert(is_list(list))
+  [for (i = [len(list) - 1:-1:0]) list[i]];
 
 /**
  * @brief Use an accumulator function to convert a list to a single element.
@@ -19,21 +19,18 @@ function reverse(list) =
  * @param start Initial value.
  */
 function aggregate(list, accumulator, start) =
-    assert(is_list(list))
-    assert(is_function(accumulator))
-    assert(!is_undef(start))
-    let(count=len(list))
-    [
-        for(i=0, a=start; i<count; a=accumulator(a, list[i]),i=i+1)
-        accumulator(a, list[i])
-    ][count-1];
+  assert(is_list(list))
+  assert(is_function(accumulator))
+  assert(!is_undef(start))
+  let (count = len(list)) [
+    for(i = 0,a = start;i < count;a = accumulator(a, list[i]),i = i + 1)accumulator(a, list[i]),
+  ][count - 1];
 
 /**
  * @brief Add all list elements together.
  */
 function sum(list) =
-    let(add = function(a, b) a+b)
-    aggregate(list, add, 0);
+  let (add = function(a, b) a + b) aggregate(list, add, 0);
 
 /**
  * @brief If all list elements return true.
@@ -42,9 +39,9 @@ function sum(list) =
  * @returns boolean
  */
 function all(list, test_fn) =
-    assert(is_list(list))
-    assert(is_function(test_fn))
-    min([for(e=list) test_fn(e) ? 1 : 0]) == 1;
+  assert(is_list(list))
+  assert(is_function(test_fn))
+  min([for (e = list) test_fn(e) ? 1 : 0]) == 1;
 
 /**
  * @brief If any list element returns true.
@@ -53,9 +50,9 @@ function all(list, test_fn) =
  * @returns boolean
  */
 function any(list, test_fn) =
-    assert(is_list(list))
-    assert(is_function(test_fn))
-    max([for(e=list) test_fn(e) ? 1 : 0]) == 1;
+  assert(is_list(list))
+  assert(is_function(test_fn))
+  max([for (e = list) test_fn(e) ? 1 : 0]) == 1;
 
 /**
  * @brief If no list element return true.
@@ -64,7 +61,7 @@ function any(list, test_fn) =
  * @returns boolean
  */
 function none(list, test_fn) =
-    !any(list, test_fn);
+  !any(list, test_fn);
 
 /**
  * @brief Convert anything to a list.
@@ -77,10 +74,10 @@ function none(list, test_fn) =
  */
 
 function as_list(object, n) =
-    is_list(object) ?
-        assert(len(object) >= n)
-        [for(i=[0:n-1]) object[i]]
-    : [for(i=[0:n-1]) object];
+  is_list(object) ?
+    assert(len(object) >= n)
+    [for (i = [0:n - 1]) object[i]]
+  : [for (i = [0:n - 1]) object];
 /**
  * @brief Convert anything to a 2d list.
  */
@@ -92,27 +89,27 @@ function as_2d(object) = as_list(object, 2);
 function as_3d(object) = as_list(object, 3);
 
 $test_list = true;
-if($test_list) {
-    assert(reverse([]) == []);
-    assert(reverse([1]) == [1]);
-    assert(reverse([1, 2, 3, 4]) == [4, 3, 2, 1]);
+if ($test_list) {
+  assert(reverse([]) == []);
+  assert(reverse([1]) == [1]);
+  assert(reverse([1, 2, 3, 4]) == [4, 3, 2, 1]);
 
-    assert(sum([1, 2, 3])==6);
+  assert(sum([1, 2, 3]) == 6);
 
-    test_f = function(v) v!=0;
-    assert(any([1, 1, 1], test_f));
-    assert(any([0, 1, 0], test_f));
-    assert(!any([0, 0, 0], test_f));
-    assert(all([1, 1, 1], test_f));
-    assert(!all([0, 1, 0], test_f));
-    assert(!all([0, 0, 0], test_f));
-    assert(!none([1, 1, 1], test_f));
-    assert(!none([0, 1, 0], test_f));
-    assert(none([0, 0, 0], test_f));
+  test_f = function(v) v != 0;
+  assert(any([1, 1, 1], test_f));
+  assert(any([0, 1, 0], test_f));
+  assert(!any([0, 0, 0], test_f));
+  assert(all([1, 1, 1], test_f));
+  assert(!all([0, 1, 0], test_f));
+  assert(!all([0, 0, 0], test_f));
+  assert(!none([1, 1, 1], test_f));
+  assert(!none([0, 1, 0], test_f));
+  assert(none([0, 0, 0], test_f));
 
-    assert(as_2d(undef) == [undef, undef]);
-    assert(as_2d("abc") == ["abc", "abc"]);
-    assert(as_2d(1) == [1, 1]);
-    assert(as_2d([1, 2]) == [1, 2]);
-    assert(as_2d([1, 2, 3]) == [1, 2]);
+  assert(as_2d(undef) == [undef, undef]);
+  assert(as_2d("abc") == ["abc", "abc"]);
+  assert(as_2d(1) == [1, 1]);
+  assert(as_2d([1, 2]) == [1, 2]);
+  assert(as_2d([1, 2, 3]) == [1, 2]);
 }

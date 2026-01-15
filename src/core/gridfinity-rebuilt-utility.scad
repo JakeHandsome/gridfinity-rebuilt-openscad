@@ -22,7 +22,7 @@ use <../helpers/list.scad>
  * @returns The final value in mm. **Excluding** base height, and stacking lip height (if present).
  */
 function fromGridfinityUnits(gridfinityUnit) =
-    gridfinityUnit * 7;
+  gridfinityUnit * 7;
 
 /**
  * @brief Convert a raw mm height to a specific height format.
@@ -31,19 +31,17 @@ function fromGridfinityUnits(gridfinityUnit) =
  * @param includes_lip Raw input value includes the (theoretical) lip height.
  * @returns Height value in mm.  Including base. Excluding lip.
  */
-function calculate_bin_height(raw_mm, includes_base=false, includes_lip=false) =
-    assert(is_num(raw_mm) && raw_mm >= 0)
-    assert(is_bool(includes_base))
-    assert(is_bool(includes_lip))
-    raw_mm
-    + (includes_base ? 0 : BASE_HEIGHT)
-    - (includes_lip ? STACKING_LIP_HEIGHT : 0);
+function calculate_bin_height(raw_mm, includes_base = false, includes_lip = false) =
+  assert(is_num(raw_mm) && raw_mm >= 0)
+  assert(is_bool(includes_base))
+  assert(is_bool(includes_lip))
+  raw_mm + (includes_base ? 0 : BASE_HEIGHT) - (includes_lip ? STACKING_LIP_HEIGHT : 0);
 
 _gridz_functions = [
-    function(h) fromGridfinityUnits(h),
-    function(h) calculate_bin_height(h, false, false),
-    function(h) calculate_bin_height(h, true, false),
-    function(h) calculate_bin_height(h, true, true),
+  function(h) fromGridfinityUnits(h),
+  function(h) calculate_bin_height(h, false, false),
+  function(h) calculate_bin_height(h, true, false),
+  function(h) calculate_bin_height(h, true, true),
 ];
 
 /**
@@ -54,8 +52,8 @@ _gridz_functions = [
  *          Otherwise, the next multiple of 7 from height_mm.
  */
 function z_snap(height_mm) =
-    height_mm % 7 == 0 ? height_mm
-    : height_mm + 7 - height_mm % 7;
+  height_mm % 7 == 0 ? height_mm
+  : height_mm + 7 - height_mm % 7;
 
 /**
  * @brief Calculates the proper height for bins. Three Functions in One.
@@ -65,13 +63,11 @@ function z_snap(height_mm) =
  * @param enable_zsnap Automatically snap the bin size to the nearest 7mm increment.
  * @returns Height in mm.  **Excluding** stacking lip height (if present).  **Possibly Excluding** base height.
  */
-function height(z, gridz_define, enable_zsnap=true) =
-    assert(is_num(z) && z >= 0)
-    assert(is_num(gridz_define)
-        && gridz_define >= 0
-        && gridz_define <= 3)
-    assert(is_bool(enable_zsnap))
+function height(z, gridz_define, enable_zsnap = true) =
+  assert(is_num(z) && z >= 0)
+  assert(
+    is_num(gridz_define) && gridz_define >= 0 && gridz_define <= 3
+  )
+  assert(is_bool(enable_zsnap))
 
-    let(raw_mm = (_gridz_functions[gridz_define])(z))
-    let(total_height = enable_zsnap ? z_snap(raw_mm) : raw_mm)
-    max(total_height, BASE_HEIGHT);
+  let (raw_mm = (_gridz_functions[gridz_define])(z)) let (total_height = enable_zsnap ? z_snap(raw_mm) : raw_mm) max(total_height, BASE_HEIGHT);

@@ -66,7 +66,7 @@ divx = 1;
 // number of Y Divisions (set to zero to have solid bin)
 divy = 1;
 // Leave zero for default. Units: mm
-depth = 0;  //.1
+depth = 0; //.1
 
 /* [Cylindrical Compartments] */
 // Use this instead of bins
@@ -109,40 +109,42 @@ hole_options = bundle_hole_options(refined_holes, magnet_holes, screw_holes, cru
 // ===== IMPLEMENTATION ===== //
 
 bin1 = new_bin(
-    grid_size = [gridx, gridy],
-    height_mm = height(gridz, gridz_define, enable_zsnap),
-    fill_height = height_internal,
-    include_lip = include_lip,
-    hole_options = hole_options,
-    only_corners = only_corners || half_grid,
-    thumbscrew = enable_thumbscrew,
-    grid_dimensions = GRID_DIMENSIONS_MM / (half_grid ? 2 : 1),
-    only_edges = only_edges,
+  grid_size=[gridx, gridy],
+  height_mm=height(gridz, gridz_define, enable_zsnap),
+  fill_height=height_internal,
+  include_lip=include_lip,
+  hole_options=hole_options,
+  only_corners=only_corners || half_grid,
+  thumbscrew=enable_thumbscrew,
+  grid_dimensions=GRID_DIMENSIONS_MM / (half_grid ? 2 : 1),
+  only_edges=only_edges,
 );
 
-echo(str(
+echo(
+  str(
     "\n",
     "Infill Dimensions*: ", bin_get_infill_size_mm(bin1), "\n",
     "Bounding Box: ", bin_get_bounding_box(bin1), "\n",
     "  *Excludes Stacking Lip Support Height (if stacking lip enabled)\n",
-));
+  )
+);
 echo("Height breakdown:");
 pprint(bin_get_height_breakdown(bin1));
 
 bin_render(bin1) {
-    bin_subdivide(bin1, [divx, divy]) {
-        depth_real = cgs(height=depth).z;
-        if (cut_cylinders) {
-            cut_chamfered_cylinder(cd/2, depth_real, c_chamfer);
-        } else {
-            cut_compartment_auto(
-                cgs(height=depth),
-                style_tab,
-                place_tab != 0,
-                scoop
-            );
-        }
+  bin_subdivide(bin1, [divx, divy]) {
+    depth_real = cgs(height=depth).z;
+    if (cut_cylinders) {
+      cut_chamfered_cylinder(cd / 2, depth_real, c_chamfer);
+    } else {
+      cut_compartment_auto(
+        cgs(height=depth),
+        style_tab,
+        place_tab != 0,
+        scoop
+      );
     }
+  }
 }
 
 // ===== EXAMPLES ===== //

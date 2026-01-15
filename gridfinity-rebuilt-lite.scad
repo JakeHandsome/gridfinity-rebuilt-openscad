@@ -73,21 +73,21 @@ hole_options = bundle_hole_options(refined_holes, magnet_holes, screw_holes, cru
 // ===== IMPLEMENTATION ===== //
 
 binL = new_bin(
-    grid_size = [gridx, gridy],
-    height_mm = height(gridz, gridz_define, enable_zsnap),
-    include_lip = style_lip == 0,
-    hole_options = hole_options,
-    only_corners = only_corners || half_grid,
-    grid_dimensions = GRID_DIMENSIONS_MM / (half_grid ? 2 : 1),
-    base_thickness = bottom_layer
+  grid_size=[gridx, gridy],
+  height_mm=height(gridz, gridz_define, enable_zsnap),
+  include_lip=style_lip == 0,
+  hole_options=hole_options,
+  only_corners=only_corners || half_grid,
+  grid_dimensions=GRID_DIMENSIONS_MM / (half_grid ? 2 : 1),
+  base_thickness=bottom_layer
 );
 
-bin_render(binL){
-    bin_subdivide(binL, [divx, divy]) {
-        cut_compartment_auto(
-            cgs(),
-            style_tab,
-            place_tab != 0
-        );
-    }
+bin_render(binL) {
+  bin_subdivide(binL, [divx, divy]) {
+    cut_compartment_auto(
+      cgs(),
+      style_tab,
+      place_tab != 0
+    );
+  }
 }
